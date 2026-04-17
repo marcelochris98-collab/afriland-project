@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+
 
 class TransfertComposant extends Model
 {
@@ -30,5 +33,12 @@ class TransfertComposant extends Model
     public function technicien(): BelongsTo
     {
         return $this->belongsTo(User::class, 'technicien_id');
+    }
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()             // Surveille toutes les colonnes
+            ->logOnlyDirty()       // N'enregistre que les colonnes qui ont réellement été modifiées
+            ->dontSubmitEmptyLogs(); // Ne crée pas de log si rien n'a changé
     }
 }

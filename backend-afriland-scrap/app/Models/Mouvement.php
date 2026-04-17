@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Mouvement extends Model
 {
@@ -26,5 +28,12 @@ class Mouvement extends Model
     public function validateur(): BelongsTo
     {
         return $this->belongsTo(User::class, 'validateur_id');
+    }
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()             // Surveille toutes les colonnes
+            ->logOnlyDirty()       // N'enregistre que les colonnes qui ont réellement été modifiées
+            ->dontSubmitEmptyLogs(); // Ne crée pas de log si rien n'a changé
     }
 }

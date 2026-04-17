@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Equipement extends Model
 {
@@ -35,5 +37,12 @@ class Equipement extends Model
     public function emplacement(): BelongsTo
     {
         return $this->belongsTo(Emplacement::class);
+    }
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()             // Surveille toutes les colonnes
+            ->logOnlyDirty()       // N'enregistre que les colonnes qui ont réellement été modifiées
+            ->dontSubmitEmptyLogs(); // Ne crée pas de log si rien n'a changé
     }
 }
