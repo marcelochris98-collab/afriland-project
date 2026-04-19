@@ -42,4 +42,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function succursale() { 
+        return $this->belongsTo(Succursale::class); 
+    }
+
+    // L'agent IT supervise les maintenances et enregistre les mouvements
+    public function maintenances() { return $this->hasMany(Maintenance::class); }
+    public function mouvements() { return $this->hasMany(Mouvement::class); }
 }
+

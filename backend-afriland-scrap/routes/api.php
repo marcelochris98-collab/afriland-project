@@ -4,6 +4,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\EquipementController;
 use App\Http\Controllers\Api\ParametreController;
+use App\Http\Controllers\Api\MaintenanceController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\TransfertComposantController;
 
 // Route de test par défaut de Laravel
 Route::get('/user', function (Request $request) {
@@ -25,6 +28,10 @@ Route::prefix('v1')->group(function () {
     Route::put('/equipements/{id}', [EquipementController::class, 'update']);
     Route::get('/categories', [ParametreController::class, 'categories']);
     Route::get('/emplacements', [ParametreController::class, 'emplacements']);
-});use App\Http\Controllers\Api\AuthController;
+    Route::post('/maintenances', [MaintenanceController::class, 'store']);
+    Route::put('/maintenances/{id}/cloturer', [MaintenanceController::class, 'cloturer']);
+    // L'API de transfert de pièces
+Route::post('/transferts-composants', [TransfertComposantController::class, 'transferer']);
+});
 
 Route::post('/login', [AuthController::class, 'login']);

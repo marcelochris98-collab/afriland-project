@@ -45,4 +45,10 @@ class Equipement extends Model
             ->logOnlyDirty()       // N'enregistre que les colonnes qui ont réellement été modifiées
             ->dontSubmitEmptyLogs(); // Ne crée pas de log si rien n'a changé
     }
+    public function succursale() { return $this->belongsTo(Succursale::class); }
+    public function niveauDefaillance() { return $this->belongsTo(NiveauDefaillance::class); }
+    
+    // Historique
+    public function maintenances() { return $this->hasMany(Maintenance::class); }
+    public function mouvements() { return $this->hasMany(Mouvement::class); }
 }
