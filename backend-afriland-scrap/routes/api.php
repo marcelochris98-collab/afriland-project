@@ -7,6 +7,10 @@ use App\Http\Controllers\Api\ParametreController;
 use App\Http\Controllers\Api\MaintenanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\TransfertComposantController;
+use App\Http\Controllers\Api\DiagnosticController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\MouvementController;
+use App\Http\Controllers\Api\RapportController;
 
 // Route de test par défaut de Laravel
 Route::get('/user', function (Request $request) {
@@ -32,6 +36,17 @@ Route::prefix('v1')->group(function () {
     Route::put('/maintenances/{id}/cloturer', [MaintenanceController::class, 'cloturer']);
     // L'API de transfert de pièces
 Route::post('/transferts-composants', [TransfertComposantController::class, 'transferer']);
+// L'API pour déclarer une panne
+Route::post('/diagnostics', [DiagnosticController::class, 'store']);
 });
 
 Route::post('/login', [AuthController::class, 'login']);
+// Gestion des Utilisateurs et Profils
+Route::get('/utilisateurs', [UserController::class, 'index']);
+Route::put('/utilisateurs/{id}/profil', [UserController::class, 'updateProfile']);
+Route::put('/utilisateurs/{id}/mot-de-passe', [UserController::class, 'changePassword']);
+// L'API pour transférer du matériel entre agences
+Route::post('/mouvements/transfert', [MouvementController::class, 'transferer']);
+// L'API pour télécharger les rapports
+Route::get('/rapports/pdf', [RapportController::class, 'exportPdf']);
+Route::get('/rapports/excel', [RapportController::class, 'exportExcel']);

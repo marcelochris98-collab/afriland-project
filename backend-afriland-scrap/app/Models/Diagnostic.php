@@ -4,9 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Diagnostic extends Model
 {
+    use HasFactory;
+    
+    protected $guarded = [];
+
     protected $fillable = [
         'equipement_id', 'date_diagnostic', 'technicien_id', 
         'type_panne', 'description_detaillee', 'composants_affectes', 
@@ -17,13 +22,8 @@ class Diagnostic extends Model
         'composants_affectes' => 'array',
     ];
 
-    public function equipement(): BelongsTo
-    {
-        return $this->belongsTo(Equipement::class);
-    }
-
-    public function technicien(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'technicien_id');
-    }
+   // Les liaisons
+    public function equipement() { return $this->belongsTo(Equipement::class); }
+    public function niveauDefaillance() { return $this->belongsTo(NiveauDefaillance::class); }
+    public function user() { return $this->belongsTo(User::class); }
 }
