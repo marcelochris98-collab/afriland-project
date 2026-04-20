@@ -14,35 +14,67 @@ class EquipementController extends Controller
     /**
      * LISTER TOUT LE STOCK
      */
-    public function index(): JsonResponse
-    {
-        $equipements = Equipement::latest()->get();
-        return response()->json([
-            'statut' => 'succès',
-            'donnees' => $equipements
-        ]);
+   public function index(Request $request): JsonResponse
+{
+    $query = Equipement::with(['succursale', 'emplacement'])->latest();
+
+    if ($request->filled('search')) {
+        $s = $request->search;
+        $query->where(function ($q) use ($s) {
+            $q->where('numero_serie', 'like', "%{$s}%")
+              ->orWhere('marque', 'like', "%{$s}%")
+              ->orWhere('modele', 'like', "%{$s}%");
+        });
     }
+
+    if ($request->filled('categorie')) {
+        $query->where('categorie', $request->categorie);
+    }
+
+    if ($request->filled('statut')) {
+        $map = [
+            'En service'     => ['en_service', 'repare'],
+            'En maintenance' => ['en_maintenance'],
+            'Au rebut'       => ['en_rebut', 'detruit'],
+            'Transféré'      => ['transfere'],
+            'Partiel'        => ['partiel'],
+        ];
+        $valeurs = $map[$request->statut] ?? [$request->statut];
+        $query->whereIn('statut', $valeurs);
+    }
+
+    if ($request->filled('agence')) {
+        $query->whereHas('succursale', function ($q) use ($request) {
+            $q->where('nom', $request->agence);
+        });
+    }
+
+    return response()->json([
+        'statut'  => 'succès',
+        'donnees' => $query->get()
+    ]);
+}
 
     /**
      * ENREGISTRER (Déjà fait, on le garde)
      */
     public function store(StoreEquipementRequest $request): JsonResponse
-    {
-        $donnees = $request->validated();
-        $equipement = Equipement::create($donnees);
+{
+    $donnees = $request->validated();
+    $equipement = Equipement::create($donnees);
 
-        $qrCodeSvg = QrCode::size(200)->generate($equipement->numero_serie);
-        $qrCodeBase64 = base64_encode($qrCodeSvg);
+    $qrCodeSvg = QrCode::size(200)->generate($equipement->numero_serie);
+    $qrCodeBase64 = base64_encode($qrCodeSvg);
 
-        return response()->json([
-            'statut' => 'succès',
-            'message' => 'Équipement enregistré avec succès.',
-            'data' => [
-                'equipement' => $equipement,
-                'qr_code' => 'data:image/svg+xml;base64,' . $qrCodeBase64
-            ]
-        ], 201);
-    }
+    return response()->json([
+        'statut'  => 'succès',
+        'message' => 'Équipement enregistré avec succès.',
+        'donnees' => [                                    // ← était "data"
+            'equipement' => $equipement,
+            'qr_code'    => 'data:image/svg+xml;base64,' . $qrCodeBase64
+        ]
+    ], 201);
+}
 
     /**
      * VOIR UN APPAREIL PRÉCIS (Détails)

@@ -51,4 +51,35 @@ class Equipement extends Model
     // Historique
     public function maintenances() { return $this->hasMany(Maintenance::class); }
     public function mouvements() { return $this->hasMany(Mouvement::class); }
+    protected $appends = ['statut_label', 'date_entree', 'agence_nom'];
+
+// Statut lisible pour le frontend
+public function getStatutLabelAttribute(): string
+{
+    return match($this->statut) {
+        'en_service'     => 'En service',
+        'en_maintenance' => 'En maintenance',
+        'en_rebut'       => 'Au rebut',
+        'repare'         => 'En service',
+        'transfere'      => 'Transféré',
+        'detruit'        => 'Au rebut',
+        'partiel'        => 'Partiel',
+        default          => ucfirst($this->statut),
+    };
+}
+
+// Date lisible
+public function getDateEntreeAttribute(): ?string
+{
+    $date = $this->date_acquisition ?? $this->date_entree_rebut;
+    return $date ? \Carbon\Carbon::parse($date)->format('d/m/Y') : null;
+}
+
+// Nom de l'agence — utilise succursale en priorité
+public function getAgenceNomAttribute(): ?string
+{
+    return $this->succursale?->nom
+        ?? $this->emplacement?->zone
+        ?? null;
+}
 }
